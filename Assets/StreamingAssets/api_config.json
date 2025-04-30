@@ -1,0 +1,9 @@
+{
+    "BaseUrl": "https://dogapi.dog/api/v2/",
+    "AuthToken": "your_dog_api_key_here",
+    "Endpoints": {
+        "GetBreeds": "breeds/",
+        "GetRandomDogImage": "images/random",
+        "GetFacts": "facts?limit=1"
+    }
+}
