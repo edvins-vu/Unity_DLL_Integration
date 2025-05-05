@@ -27,6 +27,7 @@ namespace Assets.Scripts
 
         public void CallAPIWrapper()
         {
+            // The Forget() is needed to ensure CallAPI runs without blocking Unity’s main thread
             CallAPI().Forget();
         }
 
@@ -41,6 +42,8 @@ namespace Assets.Scripts
             else
             {
                 ResponseData formattedResponse = JsonUtility.FromJson<ResponseData>(response);
+
+                // Displaying formated response to game text object
                 factUIHandler.UpdateFacts(formattedResponse.data);
             }
         }

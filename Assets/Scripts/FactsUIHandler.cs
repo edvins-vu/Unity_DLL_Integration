@@ -8,6 +8,8 @@ namespace Assets.Scripts
     {
         public TextMeshProUGUI responseText;
 
+
+        // Add parsed response text to game display object
         public void UpdateFacts(List<Fact> facts)
         {
             string formattedText = "Facts:\n";
