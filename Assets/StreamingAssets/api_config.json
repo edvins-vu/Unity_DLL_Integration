@@ -4,6 +4,6 @@
     "Endpoints": {
         "GetBreeds": "breeds/",
         "GetRandomDogImage": "images/random",
-        "GetFacts": "facts?limit=1"
+        "GetFacts": "facts?limit=2"
     }
 }
