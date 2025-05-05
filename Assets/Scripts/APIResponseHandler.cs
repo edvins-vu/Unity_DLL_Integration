@@ -10,22 +10,22 @@ using System.Collections.Generic;
 public class APIResponseHandler : MonoBehaviour
 {
 	public TextMeshProUGUI responseText;
-	//private APIManager _apiManager;
+	private APIManager _apiManager;
 
 	public async void CallAPI()
 	{
 		string configPath = System.IO.Path.Combine(Application.streamingAssetsPath, "api_config.json");
-		APIConfig.LoadConfig(configPath);
+		APIConfig config = APIConfig.LoadConfig(configPath);
 
-		//HttpClient client = new HttpClient();
-		//_apiManager = new APIManager(client, config);
+		HttpClient client = new HttpClient();
+		_apiManager = new APIManager(client, config);
 
 		string endPoint = "GetFacts";
 
 		try
 		{
 			Debug.Log("Calling API...");
-			string response = await APIManager.SendRequest(endPoint, HttpMethod.Get);
+			string response = await _apiManager.SendRequest(endPoint, HttpMethod.Get);
 
 			if (response.StartsWith("Error"))
 			{
