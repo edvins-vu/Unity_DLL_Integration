@@ -12,7 +12,7 @@ namespace Assets.Scripts
         public FactUIHandler factUIHandler;
         private APIService _apiService;
 
-        private string endPoint = "GetFacts";
+        private string _endPoint = "GetFacts";
 
         private void Start()
         {
@@ -33,7 +33,7 @@ namespace Assets.Scripts
 
         public async UniTask CallAPI()
         {
-            string response = await _apiService.FetchFactsAsync(endPoint);
+            string response = await _apiService.FetchFactsAsync(_endPoint);
 
             if (response.StartsWith("Error"))
             {
