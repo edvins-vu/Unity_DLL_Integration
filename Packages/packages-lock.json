@@ -8,7 +8,7 @@
       "url": "https://package.openupm.com"
     },
     "com.estoty.gamekit-sdk": {
-      "version": "file:estoty.gamekit-sdk",
+      "version": "file:gamekit-sdk",
       "depth": 0,
       "source": "embedded",
       "dependencies": {
