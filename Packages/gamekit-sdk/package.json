@@ -1,0 +1,25 @@
+{
+	"name": "com.estoty.gamekit-sdk",
+	"version": "0.1.1",
+	"displayName": "Gamekit SDK",
+	"description": "Gamekit SDK",
+	"documentationUrl": "https://github.com/Estoty/com.estoty.gamekit-sdk/blob/master/README.md",
+	"changelogUrl": "https://github.com/Estoty/com.estoty.gamekit-sdk/releases",
+	"unity": "2022.3",
+	"author": {
+		"name": "Estoty"
+	},
+	"publishConfig": {
+		"registry": "https://pkgs.estoty.games/"
+	},
+	"contributors": [
+		{
+			"name": "Jānis Gitendorfs",
+			"email": "janis.gitendorfs@estoty.com"
+		}
+	],
+	"dependencies": {
+		"com.unity.nuget.newtonsoft-json": "3.2.1",
+		"com.heroiclabs.nakama-unity": "3.14.0"
+	}
+}

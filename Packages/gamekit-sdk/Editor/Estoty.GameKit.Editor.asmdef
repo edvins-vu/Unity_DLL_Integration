@@ -1,0 +1,18 @@
+{
+    "name": "Estoty.GameKit.Editor",
+    "rootNamespace": "Estoty.GameKit",
+    "references": [
+        "GUID:2438d61235f13334f8063dda98b7c501"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
