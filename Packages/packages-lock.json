@@ -12,8 +12,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
-        "com.unity.nuget.newtonsoft-json": "3.2.1",
-        "com.heroiclabs.nakama-unity": "3.14.0"
+        "com.unity.nuget.newtonsoft-json": "3.2.1"
       }
     },
     "com.unity.adaptiveperformance": {
