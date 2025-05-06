@@ -5,7 +5,7 @@ using Nakama;
 
 namespace Estoty.Gamekit.Core
 {
-	public interface ISessionHandler
+	public interface ISessionHandler: IDisposable
 	{
 		Task<Response> Logout();
 		Task<Response> RefreshAccount();

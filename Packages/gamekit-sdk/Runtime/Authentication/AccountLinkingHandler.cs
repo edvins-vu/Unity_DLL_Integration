@@ -6,6 +6,7 @@ using Estoty.GameKit.Utility.Responses;
 using Nakama;
 using UnityEngine;
 using ILogger = Estoty.Gamekit.Logger.ILogger;
+using IAuthProvider = Estoty.GameKit.Authentication.Providers.IAuthProvider;
 
 namespace Estoty.GameKit.Authentication
 {
