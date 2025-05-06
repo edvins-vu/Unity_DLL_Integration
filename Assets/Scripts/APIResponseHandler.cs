@@ -1,94 +1,51 @@
 using UnityEngine;
-using TMPro;
-using System.Net.Http;
-using API_Handler;
-using Assets.Scripts;
+using Cysharp.Threading.Tasks;
+using UnityEngine.UI;
 using System.Collections.Generic;
-//using Newtonsoft.Json.Linq;
+using API_Handler;
 
-
-public class APIResponseHandler : MonoBehaviour
+namespace Assets.Scripts
 {
-	public TextMeshProUGUI responseText;
-	//private APIManager _apiManager;
+    public class APIResponseHandler : MonoBehaviour
+    {
+        public Button callApiButton;
+        public FactUIHandler factUIHandler;
+        private APIService _apiService;
 
-	public async void CallAPI()
-	{
-		string configPath = System.IO.Path.Combine(Application.streamingAssetsPath, "api_config.json");
-		APIConfig.LoadConfig(configPath);
+        private string _endPoint = "GetFacts";
 
-		//HttpClient client = new HttpClient();
-		//_apiManager = new APIManager(client, config);
+        private void Start()
+        {
+            callApiButton.onClick.AddListener(CallAPIWrapper);
 
-		string endPoint = "GetFacts";
+            // Load API configuration and initialize APIService
+            string configPath = System.IO.Path.Combine(Application.streamingAssetsPath, "api_config.json");
+            APIConfig config = APIConfig.LoadConfig(configPath);
 
-		try
-		{
-			Debug.Log("Calling API...");
-			string response = await APIManager.SendRequest(endPoint, HttpMethod.Get);
+            _apiService = new APIService(config);
+        }
 
-			if (response.StartsWith("Error"))
-			{
-				responseText.text = "Error: " + response;
-			}
-			else
-			{
+        public void CallAPIWrapper()
+        {
+            // The Forget() is needed to ensure CallAPI runs without blocking Unity’s main thread
+            CallAPI().Forget();
+        }
 
-				ResponseData formattedResponse = JsonUtility.FromJson<ResponseData>(response);
-				Fact fact = formattedResponse.data[0];
+        public async UniTask CallAPI()
+        {
+            string response = await _apiService.FetchFactsAsync(_endPoint);
 
-				responseText.text = fact.attributes.body;
-			}
-		}
-		catch (System.Exception ex)
-		{
-			responseText.text = "Unexpected error: " + ex.Message;
-			Debug.LogError("Encountered an Exception: " + ex.Message);
-		}
-	}
+            if (response.StartsWith("Error"))
+            {
+                factUIHandler.responseText.text = "Error: " + response;
+            }
+            else
+            {
+                ResponseData formattedResponse = JsonUtility.FromJson<ResponseData>(response);
 
-	public void HandleApiResponse(string jsonResponse, string requestType)
-	{
-		if (requestType == "fact")
-		{
-			ApiResponse<Fact> response = JsonUtility.FromJson<ApiResponse<Fact>>(jsonResponse);
-			DisplayFacts(response.data);
-		}
-		//else if (requestType == "breed")
-		//{
-		//	ApiResponse<Breed> response = JsonUtility.FromJson<ApiResponse<Breed>>(jsonResponse);
-		//	DisplayBreeds(response.data);
-		//}
-		else
-		{
-			responseText.text = "Error: Unsupported data type.";
-		}
-	}
-
-	public void DisplayFacts(List<Fact> facts)
-	{
-		string formattedText = "Facts:\n";
-
-		foreach (Fact fact in facts)
-		{
-			formattedText += $"- {fact.attributes.body}\n";
-		}
-
-		responseText.text = formattedText;
-	}
-
-	//private string FormatJsonResponse(string json)
-	//{
-	//	try
-	//	{
-	//		JObject formattedJson = JObject.Parse(json);
-	//		string responseBody = (string)formattedJson["data"];
-
-	//		return responseBody;
-	//	}
-	//	catch
-	//	{
-	//		return "Error: Could not parse response!";
-	//	}
-	//}
+                // Displaying formated response to game text object
+                factUIHandler.UpdateFacts(formattedResponse.data);
+            }
+        }
+    }
 }
