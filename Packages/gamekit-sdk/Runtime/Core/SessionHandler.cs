@@ -14,7 +14,9 @@ namespace Estoty.Gamekit.Core
 		public bool Initialized { get; private set; }
 		public ISession Session { get; private set; }
 		public IApiAccount Account { get; private set; }
-	
+
+		public bool SessionValid => Session != null && !Session.IsExpired;
+
 		private string DeviceId
 		{
 			get

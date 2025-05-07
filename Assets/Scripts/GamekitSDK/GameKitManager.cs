@@ -1,54 +1,69 @@
 using UnityEngine;
 using System.Threading.Tasks;
 using Estoty.Gamekit.Core;
+using System;
 
 public class GamekitManager : MonoBehaviour
 {
-    private GamekitSDK _gamekitClient;
+	private GamekitSDK _gamekitClient;
 
-    // Set in the Inspector?
-    public string serverURL = "YOUR_URL";
-    public string serverPort = "YOUR_PORT";
-    public string apiKey = "YOUR_X_API_KEY";
-    public string appVersion = "YOUR_APP_VERSION";
-    public string userIdToFetch = "USER_ID_TO_FETCH";
+	// Set in the Inspector?
+	public string serverURL = "http://localhost";
+	public string serverPort = "7350";
+	public string apiKey = "gamekit_server_mailbox_list_rpc";
+	public string userIdToFetch = "00000000-0000-0000-0000-000000000000";
 
-    async void Start()
-    {
-        // Initialize the GamekitSDK
-        _gamekitClient = new GamekitSDK(serverURL, serverPort, apiKey, appVersion);
+	async void Start()
+	{
+		InitializeGamekitSDK();
+		await FetchMail();
+	}
 
-        // Try to fetch mail on start
-        await FetchMail();
-    }
+	private async void InitializeGamekitSDK()
+	{
+		if (Uri.TryCreate(serverURL, UriKind.Absolute, out var uri))
+		{
+			_gamekitClient = new GamekitSDK(uri.Host, serverPort, apiKey); // Pass just the host
+			await _gamekitClient.SessionHandler.AttemptRestoreSession(); // Attempt to restore the session
 
-    // Example method to trigger fetching mail from other parts of your code
-    public async Task<MailboxResponse> FetchMail()
-    {
-        if (_gamekitClient != null)
-        {
-            var mailResponse = await _gamekitClient.GetMail(userIdToFetch);
+		}
+		else
+		{
+			Debug.LogError($"Invalid server URL: {serverURL}");
+			return;
+		}
+	}
 
-            if (mailResponse.Failed)
-            {
-                Debug.LogError($"[GamekitManager] Failed to get mail: {mailResponse.Exception}");
-                return null;
-            }
-            else
-            {
-                return mailResponse.Payload;
-            }
-        }
-        else
-        {
-            Debug.LogError("[GamekitManager] GamekitSDK client is not initialized.");
-            return null;
-        }
-    }
+	// Example method to trigger fetching mail
+	public async Task<MailboxResponse> FetchMail()
+	{
+		//Debug.LogError("Session status: " + _gamekitClient != null);
+		//Debug.LogError("Session: " + _gamekitClient.SessionHandler != null);
 
-    // Ensure proper disposal when the GameObject is destroyed
-    private void OnDestroy()
-    {
-        _gamekitClient?.Dispose();
-    }
+		if (_gamekitClient != null && _gamekitClient.SessionHandler != null) //&& _gamekitClient.SessionHandler.SessionValid)
+		{
+			var mailResponse = await _gamekitClient.GetMail(userIdToFetch);
+
+			if (mailResponse.Failed)
+			{
+				Debug.LogError($"[GamekitManager] Failed to get mail: {mailResponse.Exception}");
+				return null;
+			}
+			else
+			{
+				return mailResponse.Payload;
+			}
+		}
+		else
+		{
+			Debug.LogError("[GamekitManager] GamekitSDK client is not initialized.");
+			return null;
+		}
+	}
+
+	// Ensure proper disposal when the GameObject is destroyed
+	private void OnDestroy()
+	{
+		_gamekitClient?.Dispose();
+	}
 }

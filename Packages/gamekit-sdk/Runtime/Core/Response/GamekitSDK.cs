@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Estoty.GameKit.Authentication;
 using Estoty.GameKit.Authentication.Providers;
 using Estoty.GameKit.Utility.Responses;
 using Nakama;
+using Newtonsoft.Json;
 using UnityEngine;
 using ILogger = Estoty.Gamekit.Logger.ILogger;
 
 namespace Estoty.Gamekit.Core
 {
-    public partial class GamekitSDK : IDisposable
+    public class GamekitSDK : IDisposable
     {
         private readonly IClient _client;
         private readonly ISessionHandler _sessionHandler;
@@ -20,7 +22,12 @@ namespace Estoty.Gamekit.Core
         private readonly CancellationTokenSource _cancellationTokenSource;
         private readonly CancellationToken _cancellationToken;
 
-        public GamekitSDK(string url, string port, string apiKey, string appVersion)
+		public SessionHandler SessionHandler
+		{
+			get { return (SessionHandler)_sessionHandler; }
+		}
+
+        public GamekitSDK(string url, string port, string apiKey)
         {
             _cancellationTokenSource = new CancellationTokenSource();
             _cancellationToken = _cancellationTokenSource.Token;
@@ -28,14 +35,19 @@ namespace Estoty.Gamekit.Core
             // Initialize a default logger
             _logger = new DefaultLogger();
 
-            var serverConfig = ScriptableObject.CreateInstance<ServerConfigRecord>();
+            var serverConfig = ServerConfigRecord.Instance;
 
-            _client = new Client(serverConfig.Protocol, serverConfig.Host, serverConfig.Port, serverConfig.Key);
+            serverConfig.Protocol = Uri.UriSchemeHttp.ToString();
+			serverConfig.Host = url;
+            serverConfig.Port = int.Parse(port);
+            serverConfig.Key = apiKey;
+
+			_client = new Client(serverConfig.Protocol, serverConfig.Host, serverConfig.Port, serverConfig.Key);
 
             // For now initialize a default, to be replaced with specific one then
             IAuthProvider authProvider = new DefaultAuthProvider();
 
-            var authHandler = new AuthHandler(appVersion, _client, _logger, authProvider);
+            var authHandler = new AuthHandler(Application.version, _client, _logger, authProvider);
             _sessionHandler = new SessionHandler(_cancellationTokenSource, authHandler, _client, _logger);
             _rpcHandler = new RpcHandler(_logger, _client, _sessionHandler, _cancellationToken);
 
@@ -43,25 +55,24 @@ namespace Estoty.Gamekit.Core
             _sessionHandler.AttemptRestoreSession();
         }
 
-        // Example method to get mail
-        public async Task<Response<MailboxResponse>> GetMail(string userId)
-        {
-            string endpoint = $"api/mail/{userId}";
-            var response = await _rpcHandler.SendRequest<MailboxResponse>(endpoint);
+		// Example method to get mail
+		public async Task<Response<MailboxResponse>> GetMail(string userId)
+		{
+			const string rpcId = "gamekit_server_mailbox_list_rpc";
+			Dictionary<string, string> parameters = new Dictionary<string, string> { { "user_id", userId } };
 
-            if (response.Failed)
-            {
-                _logger.Error($"[GamekitSDK] Failed to get mail for user {userId}: {response.Exception}");
-            }
-            else
-            {
-                _logger.DebugFormat($"[GamekitSDK] Successfully retrieved mail for user {userId}.");
-            }
+			try
+			{
+				return await _rpcHandler.SendRequest<MailboxResponse>(rpcId, parameters);
+			}
+			catch (Exception e)
+			{
+				_logger.Error($"[GamekitSDK] Error during GetMail RPC for user {userId}: {e}");
+				return new Response<MailboxResponse>(e);
+			}
+		}
 
-            return response; // Return the Response object containing success or failure information
-        }
-
-        public void Dispose()
+		public void Dispose()
         {
             _sessionHandler?.Dispose();
             _cancellationTokenSource?.Dispose();
