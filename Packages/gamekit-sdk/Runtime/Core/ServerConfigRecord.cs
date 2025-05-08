@@ -12,7 +12,7 @@ namespace Estoty.Gamekit.Core
 			{
 				if (_instance == null)
 				{
-					_instance = Resources.Load<ServerConfigRecord>(nameof(ServerConfigRecord));
+					_instance = UnityEngine.Resources.Load<ServerConfigRecord>(nameof(ServerConfigRecord));
 
 					if (_instance == null)
 					{

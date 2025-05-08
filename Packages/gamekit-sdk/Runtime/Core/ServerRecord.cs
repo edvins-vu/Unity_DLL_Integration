@@ -13,7 +13,7 @@ namespace Estoty.Gamekit.Core
 				return Production;
 #elif DEVELOPMENT_BUILD
 				return Development;
-#elif UNITY_EDITOR
+#else
 				return UseLocal ? Local : Development;
 #endif
 			}

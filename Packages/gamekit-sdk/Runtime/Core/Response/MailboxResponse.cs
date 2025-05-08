@@ -13,7 +13,7 @@ namespace Estoty.Gamekit.Core
         public List<Notification> Notifications { get; set; }
     }
 
-    public class Notification
+	public class Notification
     {
         [JsonProperty("id")]
         public string Id { get; set; }

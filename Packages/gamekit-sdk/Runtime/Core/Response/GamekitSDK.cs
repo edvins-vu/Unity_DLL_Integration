@@ -6,7 +6,6 @@ using Estoty.GameKit.Authentication;
 using Estoty.GameKit.Authentication.Providers;
 using Estoty.GameKit.Utility.Responses;
 using Nakama;
-using Newtonsoft.Json;
 using UnityEngine;
 using ILogger = Estoty.Gamekit.Logger.ILogger;
 
@@ -44,16 +43,16 @@ namespace Estoty.Gamekit.Core
 
 			_client = new Client(serverConfig.Protocol, serverConfig.Host, serverConfig.Port, serverConfig.Key);
 
-            // For now initialize a default, to be replaced with specific one then
             IAuthProvider authProvider = new DefaultAuthProvider();
 
             var authHandler = new AuthHandler(Application.version, _client, _logger, authProvider);
             _sessionHandler = new SessionHandler(_cancellationTokenSource, authHandler, _client, _logger);
             _rpcHandler = new RpcHandler(_logger, _client, _sessionHandler, _cancellationToken);
 
-            // Start the session restoration process
+            // Session restoration process
             _sessionHandler.AttemptRestoreSession();
-        }
+            _logger.DebugFormat($"[{nameof(GamekitSDK)}] GamekitSDK initialized with URL: {url}, Port: {port}, API Key: {apiKey}");
+		}
 
 		// Example method to get mail
 		public async Task<Response<MailboxResponse>> GetMail(string userId)
@@ -69,6 +68,28 @@ namespace Estoty.Gamekit.Core
 			{
 				_logger.Error($"[GamekitSDK] Error during GetMail RPC for user {userId}: {e}");
 				return new Response<MailboxResponse>(e);
+			}
+		}
+
+        public async Task<Response<MessageResponse>> ReadNotification(string notificationId)
+		{
+			const string rpcId = "gamekit_client_mailbox_read_rpc";
+
+			_logger.DebugFormat($"CHECK MESSSAGE id being processed: {notificationId}");
+
+			Dictionary<string, object> parameters = new Dictionary<string, object> 
+			{
+				{ "ids", new string[] { notificationId } } //  Pass an array of strings
+			};
+
+			try
+			{
+				return await _rpcHandler.SendRequest<MessageResponse>(rpcId, parameters);
+			}
+			catch (Exception e)
+			{
+				_logger.Error($"[GamekitSDK] Error during ReadNotification RPC for user {notificationId}: {e}");
+				return new Response<MessageResponse>(e);
 			}
 		}
 

@@ -43,7 +43,7 @@ namespace Estoty.Gamekit.Core
 
 		public Task<Response<T>> SendRequest<T>(string endpoint, object payload)
 		{
-			_logger.DebugFormat($"Calling the RpcHandler SendRQ ({endpoint}), {payload.ToString()}");
+			_logger.Info($"Calling the RpcHandler SendRQ ({endpoint}), {payload}");
 			return SendResponseRequestInternal<T>(endpoint, payload);
 		}
 
@@ -79,14 +79,19 @@ namespace Estoty.Gamekit.Core
 		 
 			try
 			{
+				_logger.Info($"Calling _rpcExecutor.Execute() for endpoint: {endpoint}");
+
 				Response<IApiRpc> response = await _rpcExecutor.Execute(() => RpcAsync(endpoint, payload));
-				_logger.DebugFormat($"Response from _rpcExecutor.Execute() - Failed: {response.Failed}, " +
+
+				_logger.Info($"Response from _rpcExecutor.Execute() - Failed: {response.Failed}, " +
 					$"Exception: {response.Exception}, Payload: {response.Payload?.Payload}");
 
 				_cancellationToken.ThrowIfCancellationRequested();
 				
 				if (response.Failed)
 				{
+					_logger.Info($"RPCAsync executed but Response failed: {response.Exception}");
+
 					LogError(endpoint, payload, response.Exception);
 					return new Response<T>(response.Exception);
 				}
@@ -100,6 +105,8 @@ namespace Estoty.Gamekit.Core
 			}
 			catch (Exception exception)
 			{
+				_logger.Info($"Exception in SendResponseRequestInternal - Response<IApiRpc> response");
+
 				LogError(endpoint, payload, exception);
 				return new Response<T>(exception);
 			}
@@ -109,12 +116,15 @@ namespace Estoty.Gamekit.Core
 		{
 			if (payload == null)
 			{
-				_logger.DebugFormat($"RpcHandler RpcAsync - Payloaad is nukll");
+				_logger.Info($"RpcHandler RpcAsync - Payloaad is nukll");
 				return _client.RpcAsync(_sessionHandler.Session, endpoint, canceller: _cancellationToken);
 			}
 			
 			string payloadJson = JsonConvert.SerializeObject(payload);
-			_logger.DebugFormat($"RpcHandler RpcAsync - Payload is not null");
+
+			_logger.Info($"RPCASYNC payloadJson: {payloadJson}");
+			_logger.Info($"RpcHandler RpcAsync - Payload is not null. {_client.ToString()}");
+
 			return _client.RpcAsync(_sessionHandler.Session, endpoint, payloadJson, canceller: _cancellationToken);
 		}
 

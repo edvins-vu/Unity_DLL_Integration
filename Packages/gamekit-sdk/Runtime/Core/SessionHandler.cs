@@ -60,14 +60,11 @@ namespace Estoty.Gamekit.Core
 
         public async Task<Response> Logout()
         {
-            _logger.DebugFormat($"[{nameof(SessionHandler)}] Logout started.");
             Response response = await _authHandler.LogoutAsync(Session);
-            _logger.DebugFormat($"[{nameof(SessionHandler)}] Logout response - Failed: {response.Failed}");
 
             if (response.Failed == false)
             {
                 Session = null;
-                _logger.DebugFormat($"[{nameof(SessionHandler)}] Session set to null after logout.");
             }
 
             return response;
@@ -75,16 +72,13 @@ namespace Estoty.Gamekit.Core
 
         public async Task<Response> RefreshAccount()
         {
-            _logger.DebugFormat($"[{nameof(SessionHandler)}] RefreshAccount started.");
             try
             {
                 Account = await _client.GetAccountAsync(Session, canceller: CancellationToken);
-                _logger.DebugFormat($"[{nameof(SessionHandler)}] RefreshAccount successful.");
                 return new Response();
             }
             catch (Exception exception)
             {
-                _logger.Error($"[{nameof(SessionHandler)}] Failed to retrieve account: {exception}");
                 return new Response(exception);
             }
         }
