@@ -51,7 +51,7 @@ namespace Estoty.Gamekit.Core
 
             // Session restoration process
             _sessionHandler.AttemptRestoreSession();
-            _logger.DebugFormat($"[{nameof(GamekitSDK)}] GamekitSDK initialized with URL: {url}, Port: {port}, API Key: {apiKey}");
+            _logger.Info($"[{nameof(GamekitSDK)}] GamekitSDK initialized with URL: {url}, Port: {port}, API Key: {apiKey}");
 		}
 
 		// Example method to get mail
@@ -75,7 +75,7 @@ namespace Estoty.Gamekit.Core
 		{
 			const string rpcId = "gamekit_client_mailbox_read_rpc";
 
-			_logger.DebugFormat($"CHECK MESSSAGE id being processed: {notificationId}");
+			_logger.Info($"CHECK MESSSAGE id being processed: {notificationId}");
 
 			Dictionary<string, object> parameters = new Dictionary<string, object> 
 			{
