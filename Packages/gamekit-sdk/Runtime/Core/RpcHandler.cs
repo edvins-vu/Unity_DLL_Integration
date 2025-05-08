@@ -80,7 +80,8 @@ namespace Estoty.Gamekit.Core
 			try
 			{
 				Response<IApiRpc> response = await _rpcExecutor.Execute(() => RpcAsync(endpoint, payload));
-				_logger.DebugFormat($"Response from _rpcExecutor.Execute() - Failed: {response.Failed}, Exception: {response.Exception}, Payload: {response.Payload?.Payload}");
+				_logger.DebugFormat($"Response from _rpcExecutor.Execute() - Failed: {response.Failed}, " +
+					$"Exception: {response.Exception}, Payload: {response.Payload?.Payload}");
 
 				_cancellationToken.ThrowIfCancellationRequested();
 				

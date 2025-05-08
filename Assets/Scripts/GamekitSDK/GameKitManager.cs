@@ -10,7 +10,7 @@ public class GamekitManager : MonoBehaviour
 	// Set in the Inspector?
 	public string serverURL = "http://localhost";
 	public string serverPort = "7350";
-	public string apiKey = "gamekit_server_mailbox_list_rpc";
+	public string apiKey = "defaultkey";
 	public string userIdToFetch = "00000000-0000-0000-0000-000000000000";
 
 	async void Start()
@@ -23,9 +23,8 @@ public class GamekitManager : MonoBehaviour
 	{
 		if (Uri.TryCreate(serverURL, UriKind.Absolute, out var uri))
 		{
-			_gamekitClient = new GamekitSDK(uri.Host, serverPort, apiKey); // Pass just the host
+			_gamekitClient = new GamekitSDK(uri.Host, serverPort, apiKey); // Pass just the host part
 			await _gamekitClient.SessionHandler.AttemptRestoreSession(); // Attempt to restore the session
-
 		}
 		else
 		{
