@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec94a7c0a68645cdbb5843efc8da7987, type: 3}
   m_Name: ServerConfigRecord
   m_EditorClassIdentifier: 
-  <Protocol>k__BackingField: 
-  <Host>k__BackingField: 
-  <Port>k__BackingField: 0
-  <Key>k__BackingField: 
+  <Protocol>k__BackingField: http
+  <Host>k__BackingField: localhost
+  <Port>k__BackingField: 7350
+  <Key>k__BackingField: defaultkey
