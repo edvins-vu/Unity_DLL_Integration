@@ -35,18 +35,10 @@ namespace Estoty.Gamekit.Core
 		
 		public async Task<Response<T>> Execute<T>(Func<Task<T>> task)
 		{
-			_logger.Info($"Entered the RpcExecutor Execute<T>(Func<Task<T>> task");
 			Response<T> response = await Send(task);
-
-			_logger.Info($"Response from SendRQ: {response.ToString()}");
-
-			_logger.Info($"Response from Execute method SendRQ. status: {response.Failed == false}");
 
 			if (response.Failed == false)
 			{
-				_logger.Info($"ExeCute Send has suceeded, Returning to SendResponseRequestInternal with response:.{response.ToString()}");
-				_logger.Info($"Returning response with Failed status: {response.Failed == true}" +
-					$" response: {response}");
 				return response;
 			}
 			
@@ -61,8 +53,7 @@ namespace Estoty.Gamekit.Core
 			
 			_logger.Info($"Executing Send with retryTaskResponse now.");
 			Response<T> retryResponse = await Send(task);
-			
-			_logger.Info($"Response from SendRQ: {retryResponse.ToString()}");
+
 			return retryResponse;
 		}
 
@@ -70,12 +61,10 @@ namespace Estoty.Gamekit.Core
 		{
 			try
 			{
-				_logger.Info($"Calling the RpcExecutor SendRQ, task: {task}");
 				T payload = await task();
-
-				_logger.Info($"Payload from SendRQ: {payload.ToString()}");
 				var returned = new Response<T>(payload);
-				_logger.Info($"Returning from SendRQ: {returned.Payload}");
+
+				_logger.Info($"Received response from server, now casted in Response<T> format from SendRQ: {returned.Payload}");
 
 				return new Response<T>(payload);
 			}

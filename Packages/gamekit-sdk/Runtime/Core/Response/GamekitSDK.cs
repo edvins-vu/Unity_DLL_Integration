@@ -11,50 +11,51 @@ using ILogger = Estoty.Gamekit.Logger.ILogger;
 
 namespace Estoty.Gamekit.Core
 {
-    public class GamekitSDK : IDisposable
-    {
-        private readonly IClient _client;
-        private readonly ISessionHandler _sessionHandler;
-        private readonly IRpcHandler _rpcHandler;
-        private readonly ILogger _logger;
+	public class GamekitSDK : IDisposable
+	{
+		private readonly IClient _client;
+		private readonly ISessionHandler _sessionHandler;
+		private readonly IRpcHandler _rpcHandler;
+		private readonly ILogger _logger;
 
-        private readonly CancellationTokenSource _cancellationTokenSource;
-        private readonly CancellationToken _cancellationToken;
+		private readonly CancellationTokenSource _cancellationTokenSource;
+		private readonly CancellationToken _cancellationToken;
 
 		public SessionHandler SessionHandler
 		{
 			get { return (SessionHandler)_sessionHandler; }
 		}
 
-        public GamekitSDK(string url, string port, string apiKey)
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-            _cancellationToken = _cancellationTokenSource.Token;
+		// Setting up the GamekitSDK with URL, Port, and API Key
+		public GamekitSDK(string url, string port, string apiKey)
+		{
+			_cancellationTokenSource = new CancellationTokenSource();
+			_cancellationToken = _cancellationTokenSource.Token;
 
-            // Initialize a default logger
-            _logger = new DefaultLogger();
+			// Initialize a default logger
+			_logger = new DefaultLogger();
 
-            var serverConfig = ServerConfigRecord.Instance;
+			var serverConfig = ServerConfigRecord.Instance;
 
-            serverConfig.Protocol = Uri.UriSchemeHttp.ToString();
+			serverConfig.Protocol = Uri.UriSchemeHttp.ToString();
 			serverConfig.Host = url;
-            serverConfig.Port = int.Parse(port);
-            serverConfig.Key = apiKey;
+			serverConfig.Port = int.Parse(port);
+			serverConfig.Key = apiKey;
 
 			_client = new Client(serverConfig.Protocol, serverConfig.Host, serverConfig.Port, serverConfig.Key);
 
-            IAuthProvider authProvider = new DefaultAuthProvider();
+			// Initialize the authentication provider
+			IAuthProvider authProvider = new DefaultAuthProvider();
 
-            var authHandler = new AuthHandler(Application.version, _client, _logger, authProvider);
-            _sessionHandler = new SessionHandler(_cancellationTokenSource, authHandler, _client, _logger);
-            _rpcHandler = new RpcHandler(_logger, _client, _sessionHandler, _cancellationToken);
+			var authHandler = new AuthHandler(Application.version, _client, _logger, authProvider);
+			_sessionHandler = new SessionHandler(_cancellationTokenSource, authHandler, _client, _logger);
+			_rpcHandler = new RpcHandler(_logger, _client, _sessionHandler, _cancellationToken);
 
-            // Session restoration process
-            _sessionHandler.AttemptRestoreSession();
-            _logger.Info($"[{nameof(GamekitSDK)}] GamekitSDK initialized with URL: {url}, Port: {port}, API Key: {apiKey}");
+			// Session restoration process
+			_sessionHandler.AttemptRestoreSession();
+			_logger.Info($"[{nameof(GamekitSDK)}] GamekitSDK initialized with URL: {url}, Port: {port}, API Key: {apiKey}");
 		}
 
-		// Example method to get mail
 		public async Task<Response<MailboxResponse>> GetMail(string userId)
 		{
 			const string rpcId = "gamekit_server_mailbox_list_rpc";
@@ -71,15 +72,13 @@ namespace Estoty.Gamekit.Core
 			}
 		}
 
-        public async Task<Response<MessageResponse>> ReadNotification(string notificationId)
+		public async Task<Response<MessageResponse>> ReadNotification(string notificationId)
 		{
 			const string rpcId = "gamekit_client_mailbox_read_rpc";
 
-			_logger.Info($"CHECK MESSSAGE id being processed: {notificationId}");
-
-			Dictionary<string, object> parameters = new Dictionary<string, object> 
+			Dictionary<string, object> parameters = new Dictionary<string, object>
 			{
-				{ "ids", new string[] { notificationId } } //  Pass an array of strings
+				{ "ids", new string[] { notificationId } }
 			};
 
 			try
@@ -94,9 +93,9 @@ namespace Estoty.Gamekit.Core
 		}
 
 		public void Dispose()
-        {
-            _sessionHandler?.Dispose();
-            _cancellationTokenSource?.Dispose();
-        }
-    }
+		{
+			_sessionHandler?.Dispose();
+			_cancellationTokenSource?.Dispose();
+		}
+	}
 }

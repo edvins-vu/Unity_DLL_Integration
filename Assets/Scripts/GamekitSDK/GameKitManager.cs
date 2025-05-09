@@ -16,8 +16,8 @@ public class GamekitManager : MonoBehaviour
 	async void Start()
 	{
 		await InitializeGamekitSDK();
-		Debug.Log($"MESSAGE ID  ON INITIALIZE when method called: {idToFetch}");
 		MessageResponse response = await FetchNotification();
+
 		Debug.Log($"SUCCESS: MESSAGE READ: ID: {response.Messages[0].Id}, Content: {response.Messages[0].Content.MessageText}," +
 			$"CreateTime (seconds): {response.Messages[0].CreateTime.Seconds}");
 	}
@@ -26,9 +26,9 @@ public class GamekitManager : MonoBehaviour
 	{
 		if (Uri.TryCreate(serverURL, UriKind.Absolute, out var uri))
 		{
-			Debug.Log($"MESSAGE ID  DURING INITIALIZE: {idToFetch}");
-			_gamekitClient = new GamekitSDK(uri.Host, serverPort, apiKey); // Pass just the host part
-			await _gamekitClient.SessionHandler.AttemptRestoreSession(); // Attempt to restore the session
+			Debug.Log($"MESSAGE ID  DURING INITIALIZE of GamekitSDK: {idToFetch}");
+			_gamekitClient = new GamekitSDK(uri.Host, serverPort, apiKey);
+			await _gamekitClient.SessionHandler.AttemptRestoreSession();
 		}
 		else
 		{
@@ -40,9 +40,7 @@ public class GamekitManager : MonoBehaviour
 	{
 		if (_gamekitClient != null && _gamekitClient.SessionHandler != null && _gamekitClient.SessionHandler.SessionValid)
 		{
-			Debug.Log($"MESSAGE ID BEING USED BEFORE CALLING METHOD: {idToFetch}");
 			var mailResponse = await _gamekitClient.ReadNotification(idToFetch);
-			Debug.Log($"MESSAGE ID BEING USED when method called: {idToFetch}");
 
 			if (mailResponse.Failed)
 			{
@@ -61,13 +59,9 @@ public class GamekitManager : MonoBehaviour
 		}
 	}
 
-	// Example method to trigger fetching mail
 	public async Task<MailboxResponse> FetchMail()
 	{
-		//Debug.LogError("Session status: " + _gamekitClient != null);
-		//Debug.LogError("Session: " + _gamekitClient.SessionHandler != null);
-
-		if (_gamekitClient != null && _gamekitClient.SessionHandler != null) //&& _gamekitClient.SessionHandler.SessionValid)
+		if (_gamekitClient != null && _gamekitClient.SessionHandler != null && _gamekitClient.SessionHandler.SessionValid)
 		{
 			var mailResponse = await _gamekitClient.GetMail(idToFetch);
 

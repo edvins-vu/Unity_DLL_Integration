@@ -16,7 +16,7 @@ namespace Assets.Scripts
 
         private void Start()
         {
-            callApiButton.onClick.AddListener(CallAPIWrapper);
+           // callApiButton.onClick.AddListener(CallAPIWrapper);
 
             // Load API configuration and initialize APIService
             string configPath = System.IO.Path.Combine(Application.streamingAssetsPath, "api_config.json");

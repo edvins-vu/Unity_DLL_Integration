@@ -43,7 +43,6 @@ namespace Estoty.Gamekit.Core
 
 		public Task<Response<T>> SendRequest<T>(string endpoint, object payload)
 		{
-			_logger.Info($"Calling the RpcHandler SendRQ ({endpoint}), {payload}");
 			return SendResponseRequestInternal<T>(endpoint, payload);
 		}
 
@@ -79,11 +78,9 @@ namespace Estoty.Gamekit.Core
 		 
 			try
 			{
-				_logger.Info($"Calling _rpcExecutor.Execute() for endpoint: {endpoint}");
-
 				Response<IApiRpc> response = await _rpcExecutor.Execute(() => RpcAsync(endpoint, payload));
 
-				_logger.Info($"Response from _rpcExecutor.Execute() - Failed: {response.Failed}, " +
+				_logger.Info($"Response from _rpcExecutor.Execute() received. Message read: {response.Failed}, " +
 					$"Exception: {response.Exception}, Payload: {response.Payload?.Payload}");
 
 				_cancellationToken.ThrowIfCancellationRequested();
@@ -122,8 +119,7 @@ namespace Estoty.Gamekit.Core
 			
 			string payloadJson = JsonConvert.SerializeObject(payload);
 
-			_logger.Info($"RPCASYNC payloadJson: {payloadJson}");
-			_logger.Info($"RpcHandler RpcAsync - Payload is not null. {_client.ToString()}");
+			_logger.Info($"RpcAsync payloadJson sent: {payloadJson}");
 
 			return _client.RpcAsync(_sessionHandler.Session, endpoint, payloadJson, canceller: _cancellationToken);
 		}
